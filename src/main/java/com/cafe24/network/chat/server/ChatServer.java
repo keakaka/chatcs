@@ -6,16 +6,17 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 
 public class ChatServer {
-	
+	public static HashSet<String> hset = new HashSet<String>();
 	public static void main(String[] args) {
 		
 		ServerSocket serverSocket = null;
 		List<PrintWriter> userList = new ArrayList<PrintWriter>();
-		
 		try {
 			// 1. Create Server Socket
 			serverSocket = new ServerSocket();

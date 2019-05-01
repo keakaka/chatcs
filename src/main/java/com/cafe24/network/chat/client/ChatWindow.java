@@ -25,18 +25,22 @@ public class ChatWindow {
 	private Socket socket;
 	private Frame frame;
 	private Panel pannel;
+	private Panel pannel2;
 	private Button buttonSend;
 	private TextField textField;
 	private TextArea textArea;
+	private TextArea textArea2;
 
 	public ChatWindow(String id, Socket socket) {
 		this.id = id;
 		this.socket = socket;
-		frame = new Frame(id);
+		frame = new Frame();
 		pannel = new Panel();
+		pannel2 = new Panel();
 		buttonSend = new Button("Send");
 		textField = new TextField();
-		textArea = new TextArea(30, 80);
+		textArea = new TextArea(30, 100);
+		textArea2 = new TextArea();
 		
 		new ChatClientReceiveThread(socket).start();
 	}
@@ -48,22 +52,27 @@ public class ChatWindow {
 		buttonSend.addActionListener( new ActionListener() {
 			@Override
 			public void actionPerformed( ActionEvent actionEvent ) {
-				sendMessage();
+				if(!textField.getText().equals("")) {
+			    	sendMessage();
+			    }
 			}
 		});
 
 		// Textfield
 		textField.setColumns(80);
-		textField.addKeyListener(new KeyAdapter() {
+		textField.addActionListener(new ActionListener() {
 			@Override
-			public void keyPressed( KeyEvent e ) {
-				char keyCode = e.getKeyChar();
-				if(keyCode == KeyEvent.VK_ENTER) {
-					sendMessage();
-				}
+			public void actionPerformed(ActionEvent e) {
+			    if(!textField.getText().equals("")) {
+			    	sendMessage();
+			    }
 			}
+			
 		});
-
+		// Pannel2
+		pannel2.setBackground(Color.LIGHT_GRAY);
+		pannel2.add(BorderLayout.NORTH, textArea2);
+		frame.add(BorderLayout.EAST, pannel2);
 		// Pannel
 		pannel.setBackground(Color.LIGHT_GRAY);
 		pannel.add(textField);
@@ -87,7 +96,7 @@ public class ChatWindow {
 		PrintWriter pw;
 		try {
 			pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "utf-8"), true);
-			String request = "quit\r\n";
+			String request = "exit\r\n";
 			pw.println(request);
 			System.exit(0);
 		}
@@ -97,10 +106,6 @@ public class ChatWindow {
 		System.exit(0);
 	}
 	
-	private void updateTextArea(String message) {
-		textArea.append(message);
-		textArea.append("\n");
-	}
 	private void sendMessage() {
 		PrintWriter pw;
 		try {
@@ -131,6 +136,7 @@ public class ChatWindow {
 					String data = br.readLine();
 					textArea.append(data);
 					textArea.append("\n");
+					
 				}
 			}
 			catch (IOException e) {

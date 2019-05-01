@@ -21,7 +21,9 @@ public class ChatServerThread extends Thread{
 
 	@Override
 	public void run() {
-
+		for(int i = 0; i < userList.size(); i++) {
+			System.out.println(userList.get(i));
+		}
 		try {
 			// 4. I/O Stream 받아오기
 			BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf-8"));
@@ -31,7 +33,7 @@ public class ChatServerThread extends Thread{
 				String data = br.readLine();
 				if(data == null) {
 					ChatServer.log("클라이언트 연결 종료");
-					//doquit(userList);
+					exit(pw);
 					break;
 				}
 
@@ -60,40 +62,33 @@ public class ChatServerThread extends Thread{
 			}
 		}
 	}
+	private void join(String id, PrintWriter pw) {
+		this.id = id;
 
+		String data = id + "님이 입장하였습니다.";
+		broadcast(data);
+		// writer pool에 저장
+		addWriter(pw);
+	}
+	private void talk(String data) {
+		broadcast(this.id + ":" + data);
+	}
 	private void exit(PrintWriter pw) {
 		removeWriter(pw);
 
 		String data = this.id + "님이 퇴장했습니다.";
 		broadcast(data);
 	}
-
-	private void removeWriter(PrintWriter pw) {
-		synchronized (userList) {
-			userList.remove(pw);
-		}
-	}
-
-	private void talk(String data) {
-		broadcast(this.id + ":" + data);
-	}
-
-	private void join(String id, PrintWriter pw) {
-		this.id = id;
-
-		String data = id + "님이 입장하였습니다.";
-		broadcast(data);
-
-		// writer pool에 저장
-		addWriter(pw);
-	}
-
 	private void addWriter(PrintWriter pw) {
 		synchronized (userList) {
 			userList.add(pw);
 		}
 	}
-
+	private void removeWriter(PrintWriter pw) {
+		synchronized (userList) {
+			userList.remove(pw);
+		}
+	}
 	private void broadcast(String data) {
 		synchronized (userList) {
 			for(PrintWriter pw : userList) {
