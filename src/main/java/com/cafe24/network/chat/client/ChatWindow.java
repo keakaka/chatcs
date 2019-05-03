@@ -46,15 +46,7 @@ public class ChatWindow {
 		textField = new TextField();
 		textArea = new TextArea(30, 100);
 		textArea2 = new TextArea(10, 20);
-		try {
-			label = new Label(new String("귓속말은 /w 상대ID 메세지 로 보낼 수 있습니다.".getBytes(), "UTF-8"));
-		} catch (HeadlessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		label = new Label();
 		label.setSize(10, 20);
 		label.setLocation(230, 999);
 		label.setBackground(Color.LIGHT_GRAY);
@@ -94,6 +86,7 @@ public class ChatWindow {
 		pannel2.setLayout(layout);
 		pannel2.add(label);
 		pannel2.add(textArea2);
+		label.setText("귓속말은 /w ID Message 로 보낼 수 있습니다.");
 		frame.add(BorderLayout.EAST, pannel2);
 		// Pannel
 		pannel.setBackground(Color.LIGHT_GRAY);
