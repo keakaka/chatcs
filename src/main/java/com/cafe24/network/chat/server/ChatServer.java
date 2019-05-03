@@ -15,7 +15,7 @@ public class ChatServer {
 		
 		ServerSocket serverSocket = null;
 		List<PrintWriter> userList = new ArrayList<PrintWriter>();
-		HashSet<String> hset = new HashSet<String>();
+		List<String> idList = new ArrayList<String>();
 		try {
 			// 1. Create Server Socket
 			serverSocket = new ServerSocket();
@@ -28,7 +28,7 @@ public class ChatServer {
 				Socket socket = serverSocket.accept();
 
 				// 4. Delegate Processing Request
-				new ChatServerThread(socket, userList, hset).start();
+				new ChatServerThread(socket, userList, idList).start();
 			}
 
 		} catch (IOException e) {

@@ -3,6 +3,8 @@ import java.awt.BorderLayout;
 import java.awt.Button;
 import java.awt.Color;
 import java.awt.Frame;
+import java.awt.GridLayout;
+import java.awt.Label;
 import java.awt.Panel;
 import java.awt.TextArea;
 import java.awt.TextField;
@@ -30,6 +32,7 @@ public class ChatWindow {
 	private TextField textField;
 	private TextArea textArea;
 	private TextArea textArea2;
+	private Label label;
 
 	public ChatWindow(String id, Socket socket) {
 		this.id = id;
@@ -40,7 +43,12 @@ public class ChatWindow {
 		buttonSend = new Button("Send");
 		textField = new TextField();
 		textArea = new TextArea(30, 100);
-		textArea2 = new TextArea();
+		textArea2 = new TextArea(10, 20);
+		label = new Label("귓속말은 /w 상대ID 메세지 로 보낼 수 있습니다.");
+		label.setSize(10, 20);
+		label.setLocation(230, 999);
+		label.setBackground(Color.LIGHT_GRAY);
+		
 		
 		new ChatClientReceiveThread(socket).start();
 	}
@@ -59,7 +67,7 @@ public class ChatWindow {
 		});
 
 		// Textfield
-		textField.setColumns(80);
+		textField.setColumns(130);
 		textField.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -72,7 +80,10 @@ public class ChatWindow {
 		textArea2.setEditable(false);
 		// Pannel2
 		pannel2.setBackground(Color.LIGHT_GRAY);
-		pannel2.add(BorderLayout.NORTH, textArea2);
+		GridLayout layout = new GridLayout(2, 1);
+		pannel2.setLayout(layout);
+		pannel2.add(label);
+		pannel2.add(textArea2);
 		frame.add(BorderLayout.EAST, pannel2);
 		// Pannel
 		pannel.setBackground(Color.LIGHT_GRAY);
@@ -113,7 +124,13 @@ public class ChatWindow {
 		try {
 			pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "utf-8"), true);
 			String text = textField.getText();
-			String data = "talk:" + text + "\r\n";
+			String data = "";
+			if(text.startsWith("/w")) {
+				String[] token = text.split(" ");
+				data = "whis:" + token[1] +"&"+ text.substring(3+token[1].length(), text.length());
+			}else {
+				data = "talk:" + text + "\r\n";
+			}
 			pw.println(data);
 
 			textField.setText("");
@@ -138,7 +155,7 @@ public class ChatWindow {
 				while(true) {
 					String data = br.readLine();
 					if(data.startsWith("onUser")) {
-						textArea2.setText("");
+						textArea2.setText("귓속말 : /w ID Message \n");
 						String[] user = data.substring(6, data.length()).split("&");
 						for(String s : user) {
 							textArea2.append(s);
@@ -146,7 +163,7 @@ public class ChatWindow {
 						}
 						
 					}else if(data.startsWith("downUser")){
-						textArea2.setText("");
+						textArea2.setText("귓속말 : /w ID Message \n");
 						String[] user = data.substring(8, data.length()).split("&");
 						for(String s : user) {
 							textArea2.append(s);

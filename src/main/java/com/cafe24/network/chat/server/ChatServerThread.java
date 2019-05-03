@@ -15,12 +15,12 @@ public class ChatServerThread extends Thread{
 	private Socket socket;
 	private String id;
 	List<PrintWriter> userList;
-	HashSet<String> hset;
+	List<String> idList;
 	StringBuilder sb = new StringBuilder();
-	public ChatServerThread(Socket socket, List userList, HashSet<String> hset) {
+	public ChatServerThread(Socket socket, List userList, List<String> idList) {
 		this.socket = socket;
 		this.userList = userList;
-		this.hset = hset;
+		this.idList = idList;
 	}
 
 	@Override
@@ -39,7 +39,7 @@ public class ChatServerThread extends Thread{
 				}
 
 				if(data.startsWith("join:")) {
-					if(hset.contains(data.substring(5,data.length()))) {
+					if(idList.contains(data.substring(5,data.length()))) {
 						pw.println("중복된 아이디");
 						socket.close();
 						Thread.interrupted();
@@ -51,6 +51,8 @@ public class ChatServerThread extends Thread{
 					talk(data.substring(5,data.length()));
 				}else if(data.startsWith("exit:")) {
 					exit(pw);
+				}else if(data.startsWith("whis:")) {
+					whis(data.substring(5, data.length()));
 				}
 			}
 
@@ -68,6 +70,23 @@ public class ChatServerThread extends Thread{
 			}
 		}
 	}
+	private void whis(String data) {
+		String[] token = data.split("&");
+		int toIdx = 0;
+		int fromIdx = 0;
+		for(int i = 0; i < idList.size(); i++) {
+			if(token[0].equals(idList.get(i))){
+				toIdx = i;
+			}else if(this.id.equals(idList.get(i))) {
+				fromIdx = i;
+			}
+		}
+		userList.get(toIdx).println("["+this.id+"님의 귓속말] : " + data.substring(token[0].length()+1, data.length()));
+		userList.get(toIdx).flush();
+		userList.get(fromIdx).println("["+token[0]+"님에게 귓속말 보냄] : " + data.substring(token[0].length()+1, data.length()));
+		userList.get(fromIdx).flush();
+	}
+
 	private void join(String id, PrintWriter pw) {
 		this.id = id;
 		// writer pool에 저장
@@ -75,7 +94,7 @@ public class ChatServerThread extends Thread{
 		String data = id + "님이 입장하였습니다.";
 		broadcast(data);
 		String onUser = "";
-		for(String s : hset) {
+		for(String s : idList) {
 			onUser += s+"&";
 		}
 		broadcast("onUser"+onUser);
@@ -91,7 +110,7 @@ public class ChatServerThread extends Thread{
 		ChatServer.log(data);
 		broadcast(data);
 		String downUser = "";
-		for(String s : hset) {
+		for(String s : idList) {
 			downUser += s+"&";
 		}
 		broadcast("downUser"+downUser);
@@ -101,8 +120,8 @@ public class ChatServerThread extends Thread{
 		synchronized (userList) {
 			userList.add(pw);
 		}
-		synchronized (hset) {
-			hset.add(id);
+		synchronized (idList) {
+			idList.add(id);
 		}
 	}
 	private void removeWriter(PrintWriter pw) {
@@ -110,8 +129,8 @@ public class ChatServerThread extends Thread{
 			userList.remove(pw);
 			pw.close();
 		}
-		synchronized (hset) {
-			hset.remove(id);
+		synchronized (idList) {
+			idList.remove(id);
 		}
 	}
 	private void broadcast(String data) {
