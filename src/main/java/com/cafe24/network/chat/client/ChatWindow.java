@@ -4,6 +4,7 @@ import java.awt.Button;
 import java.awt.Color;
 import java.awt.Frame;
 import java.awt.GridLayout;
+import java.awt.HeadlessException;
 import java.awt.Label;
 import java.awt.Panel;
 import java.awt.TextArea;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.net.SocketException;
 
@@ -44,7 +46,15 @@ public class ChatWindow {
 		textField = new TextField();
 		textArea = new TextArea(30, 100);
 		textArea2 = new TextArea(10, 20);
-		label = new Label("귓속말은 /w 상대ID 메세지 로 보낼 수 있습니다.");
+		try {
+			label = new Label(new String("귓속말은 /w 상대ID 메세지 로 보낼 수 있습니다.".getBytes("utf-8")));
+		} catch (HeadlessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		label.setSize(10, 20);
 		label.setLocation(230, 999);
 		label.setBackground(Color.LIGHT_GRAY);

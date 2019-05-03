@@ -22,7 +22,7 @@ public class ChatServer {
 			   
 			// 2. Bind
 			serverSocket.bind( new InetSocketAddress( "0.0.0.0", 7000 ) );
-
+			
 			while (true) {
 				// 3. Wait for connecting ( accept )
 				Socket socket = serverSocket.accept();
