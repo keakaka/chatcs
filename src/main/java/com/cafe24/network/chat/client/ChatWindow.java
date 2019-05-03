@@ -47,7 +47,7 @@ public class ChatWindow {
 		textArea = new TextArea(30, 100);
 		textArea2 = new TextArea(10, 20);
 		try {
-			label = new Label(new String("귓속말은 /w 상대ID 메세지 로 보낼 수 있습니다.".getBytes("utf-8")));
+			label = new Label(new String("귓속말은 /w 상대ID 메세지 로 보낼 수 있습니다.".getBytes(), "UTF-8"));
 		} catch (HeadlessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
